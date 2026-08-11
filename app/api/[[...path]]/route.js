@@ -5,13 +5,24 @@ import { v4 as uuidv4 } from 'uuid';
 const MONGO_URL = process.env.MONGO_URL;
 const DB_NAME = process.env.DB_NAME || 'brew_and_bean';
 
-let cachedClient = null;
+// Serverless-safe MongoClient caching. In Vercel, functions are re-invoked
+// across many warm instances — we MUST cache the client promise on `globalThis`
+// so we don't blow through the connection pool and so we don't hit the
+// "Topology is closed" error when a lambda instance is reused.
 async function getDb() {
-  if (!cachedClient) {
-    cachedClient = new MongoClient(MONGO_URL);
-    await cachedClient.connect();
+  if (!globalThis.__mongoClientPromise) {
+    const client = new MongoClient(MONGO_URL, {
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 15000,
+    });
+    globalThis.__mongoClientPromise = client.connect().catch(err => {
+      globalThis.__mongoClientPromise = undefined;
+      throw err;
+    });
   }
-  return cachedClient.db(DB_NAME);
+  const client = await globalThis.__mongoClientPromise;
+  return client.db(DB_NAME);
 }
 
 const SEED_MENU = [
@@ -48,10 +59,25 @@ const SEED_MENU = [
 ];
 
 async function ensureSeed(db) {
-  const count = await db.collection('menu').countDocuments();
-  if (count === 0) {
+  // Use a marker doc + createIndex to make seeding idempotent even across
+  // concurrent cold-start lambdas on Vercel.
+  await db.collection('menu').createIndex({ name: 1 }, { unique: true }).catch(() => {});
+  const marker = await db.collection('_meta').findOne({ _id: 'seed_v1' });
+  if (marker) return;
+  try {
     const docs = SEED_MENU.map(m => ({ ...m, id: uuidv4(), createdAt: new Date().toISOString() }));
-    await db.collection('menu').insertMany(docs);
+    // insertMany with ordered:false so duplicates from race conditions are skipped
+    await db.collection('menu').insertMany(docs, { ordered: false }).catch(e => {
+      if (e.code !== 11000) throw e; // ignore duplicate-key errors only
+    });
+    await db.collection('_meta').updateOne(
+      { _id: 'seed_v1' },
+      { $set: { at: new Date().toISOString() } },
+      { upsert: true }
+    );
+  } catch (e) {
+    // Swallow — next request will retry. Don't crash the API.
+    console.error('Seed error:', e.message);
   }
 }
 
