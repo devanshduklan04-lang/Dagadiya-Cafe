@@ -16,7 +16,6 @@ async function getDb() {
       minPoolSize: 0,
       serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
-      // Explicit TLS options — required for reliable Atlas connections on Node 20+ / Vercel
       tls: true,
       retryWrites: true,
     });
@@ -25,8 +24,26 @@ async function getDb() {
       throw err;
     });
   }
-  const client = await globalThis.__mongoClientPromise;
-  return client.db(DB_NAME);
+  try {
+    const client = await globalThis.__mongoClientPromise;
+    // Verify the client is still alive with a lightweight ping
+    await client.db(DB_NAME).command({ ping: 1 });
+    return client.db(DB_NAME);
+  } catch (e) {
+    // Cached client is dead (topology closed / network drop). Reset and reconnect.
+    globalThis.__mongoClientPromise = undefined;
+    const client = new MongoClient(MONGO_URL, {
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 15000,
+      socketTimeoutMS: 45000,
+      tls: true,
+      retryWrites: true,
+    });
+    globalThis.__mongoClientPromise = client.connect();
+    const c = await globalThis.__mongoClientPromise;
+    return c.db(DB_NAME);
+  }
 }
 
 const SEED_MENU = [
