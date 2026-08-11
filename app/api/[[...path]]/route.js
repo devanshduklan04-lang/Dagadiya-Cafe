@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const MONGO_URL = process.env.MONGO_URL;
@@ -12,12 +12,14 @@ const DB_NAME = process.env.DB_NAME || 'brew_and_bean';
 async function getDb() {
   if (!globalThis.__mongoClientPromise) {
     const client = new MongoClient(MONGO_URL, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: false,
+        deprecationErrors: true,
+      },
       maxPoolSize: 10,
-      minPoolSize: 0,
       serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
-      tls: true,
-      retryWrites: true,
     });
     globalThis.__mongoClientPromise = client.connect().catch(err => {
       globalThis.__mongoClientPromise = undefined;
@@ -26,19 +28,19 @@ async function getDb() {
   }
   try {
     const client = await globalThis.__mongoClientPromise;
-    // Verify the client is still alive with a lightweight ping
     await client.db(DB_NAME).command({ ping: 1 });
     return client.db(DB_NAME);
   } catch (e) {
-    // Cached client is dead (topology closed / network drop). Reset and reconnect.
     globalThis.__mongoClientPromise = undefined;
     const client = new MongoClient(MONGO_URL, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: false,
+        deprecationErrors: true,
+      },
       maxPoolSize: 10,
-      minPoolSize: 0,
       serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
-      tls: true,
-      retryWrites: true,
     });
     globalThis.__mongoClientPromise = client.connect();
     const c = await globalThis.__mongoClientPromise;
