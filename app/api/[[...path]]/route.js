@@ -15,6 +15,10 @@ async function getDb() {
       maxPoolSize: 10,
       minPoolSize: 0,
       serverSelectionTimeoutMS: 15000,
+      socketTimeoutMS: 45000,
+      // Explicit TLS options — required for reliable Atlas connections on Node 20+ / Vercel
+      tls: true,
+      retryWrites: true,
     });
     globalThis.__mongoClientPromise = client.connect().catch(err => {
       globalThis.__mongoClientPromise = undefined;
