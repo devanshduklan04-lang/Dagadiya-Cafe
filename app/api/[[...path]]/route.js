@@ -260,6 +260,32 @@ async function handler(request, ctx) {
       return json({ status: 'ok', service: 'Dagadiya Cafe API' });
     }
 
+    if (path === 'diag' && method === 'GET') {
+      // Diagnostic endpoint — reveals connection details (never expose in real prod)
+      const info = {
+        node: process.version,
+        env_mongo_url_set: !!process.env.MONGO_URL,
+        env_mongo_url_starts: process.env.MONGO_URL?.slice(0, 25) + '...',
+        env_db_name: process.env.DB_NAME,
+        env_admin_user_set: !!process.env.ADMIN_USERNAME,
+        env_admin_pw_set: !!process.env.ADMIN_PASSWORD,
+      };
+      try {
+        const pingStart = Date.now();
+        const db2 = await getDb();
+        const ping = await db2.command({ ping: 1 });
+        info.ping_ms = Date.now() - pingStart;
+        info.ping = ping;
+        info.collections = (await db2.listCollections().toArray()).map(c => c.name);
+        info.menu_count = await db2.collection('menu').countDocuments();
+      } catch (e) {
+        info.error = e.message;
+        info.error_name = e.name;
+        info.error_code = e.code;
+      }
+      return json(info);
+    }
+
     return json({ error: 'Not found', path }, 404);
   } catch (e) {
     console.error('API error:', e);
