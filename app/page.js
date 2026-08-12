@@ -41,7 +41,7 @@ const GALLERY_IMGS = [
 const CATEGORIES = ['All', 'Coffee', 'Tea', 'Cold Beverages', 'Snacks', 'Desserts'];
 const DELIVERY_FEE = 40;
 const TAX_RATE = 0.05;
-const CAFE_WHATSAPP = '918958632829'; // country code + number, no + or spaces
+const CAFE_WHATSAPP = '918368600234'; // country code + number, no + or spaces
 const INR = (n) => '₹' + Number(n || 0).toFixed(2);
 
 // ---------- WHATSAPP HELPERS ----------
@@ -378,11 +378,11 @@ function Home({ go, menu, addToCart }) {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 rounded-2xl overflow-hidden border border-border h-[420px]">
             <iframe title="map" className="w-full h-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps?q=cafe%20mumbai&output=embed" />
+              src="https://www.google.com/maps?q=55G8%2B75+Athhoorwala,+Uttarakhand&output=embed" />
           </div>
           <div className="space-y-4">
-            <InfoRow icon={MapPin} title="Address" text="42 Linking Road, Bandra West, Mumbai 400050"/>
-            <InfoRow icon={Phone} title="Call us" text="+91 89586 32829"/>
+            <InfoRow icon={MapPin} title="Address" text="Chowk No.3, Athhoorwala, Uttarakhand 248016"/>
+            <InfoRow icon={Phone} title="Call us" text="+91 83686 00234"/>
             <InfoRow icon={Mail} title="Email" text="hello@dagadiyacafe.com"/>
             <InfoRow icon={Clock} title="Open hours" text="Mon–Sun · 7:00 AM – 11:00 PM"/>
             <Button onClick={() => go('contact')} className="rounded-full">Contact us</Button>
@@ -837,8 +837,8 @@ function Contact() {
           </CardContent>
         </Card>
         <div className="space-y-5">
-          <InfoRow icon={MapPin} title="Visit" text="42 Linking Road, Bandra West, Mumbai 400050"/>
-          <InfoRow icon={Phone} title="Call" text="+91 89586 32829"/>
+          <InfoRow icon={MapPin} title="Visit" text="Chowk No.3, Athhoorwala, Uttarakhand 248016"/>
+          <InfoRow icon={Phone} title="Call" text="+91 83686 00234"/>
           <InfoRow icon={Mail} title="Email" text="hello@dagadiyacafe.com"/>
           <InfoRow icon={Clock} title="Hours" text="Mon–Sun · 7:00 AM – 11:00 PM"/>
           <div className="flex gap-3 pt-2">
@@ -847,7 +847,7 @@ function Contact() {
             <a href="#" className="w-10 h-10 rounded-full bg-secondary grid place-items-center text-primary hover:bg-primary hover:text-primary-foreground transition"><Twitter className="w-4 h-4"/></a>
           </div>
           <div className="rounded-2xl overflow-hidden border h-[280px]">
-            <iframe title="map2" className="w-full h-full" loading="lazy" src="https://www.google.com/maps?q=cafe%20mumbai&output=embed"/>
+            <iframe title="map2" className="w-full h-full" loading="lazy" src="https://www.google.com/maps?q=55G8%2B75+Athhoorwala,+Uttarakhand&output=embed"/>
           </div>
         </div>
       </div>
@@ -1316,8 +1316,8 @@ function Footer({ go }) {
         <div>
           <div className="font-semibold mb-3">Contact</div>
           <ul className="space-y-2 text-sm text-primary-foreground/70">
-            <li className="flex gap-2 items-start"><MapPin className="w-4 h-4 mt-0.5"/> 42 Linking Road, Bandra West, Mumbai</li>
-            <li className="flex gap-2 items-center"><Phone className="w-4 h-4"/> +91 89586 32829</li>
+            <li className="flex gap-2 items-start"><MapPin className="w-4 h-4 mt-0.5"/> Chowk No.3, Athhoorwala, Uttarakhand</li>
+            <li className="flex gap-2 items-center"><Phone className="w-4 h-4"/> +91 83686 00234</li>
             <li className="flex gap-2 items-center"><Mail className="w-4 h-4"/> hello@dagadiyacafe.com</li>
           </ul>
         </div>
