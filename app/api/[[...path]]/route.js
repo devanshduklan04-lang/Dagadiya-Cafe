@@ -229,8 +229,8 @@ async function handler(request, ctx) {
     // ---- AUTH (simple) ----
     if (path === 'auth/admin' && method === 'POST') {
       const body = await request.json();
-      const ADMIN_USER = process.env.ADMIN_USERNAME || 'admin';
-      const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin123';
+      const ADMIN_USER = process.env.ADMIN_USERNAME?.trim() || 'Dagadiya_Admin';
+      const ADMIN_PASS = process.env.ADMIN_PASSWORD?.trim() || '123456';
       if (body.username === ADMIN_USER && body.password === ADMIN_PASS) {
         return json({ ok: true, token: 'admin-' + uuidv4() });
       }
