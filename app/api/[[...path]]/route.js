@@ -270,7 +270,11 @@ async function handler(request, ctx) {
         env_mongo_url_starts: process.env.MONGO_URL?.slice(0, 25) + '...',
         env_db_name: process.env.DB_NAME,
         env_admin_user_set: !!process.env.ADMIN_USERNAME,
+        env_admin_user_len: process.env.ADMIN_USERNAME?.length || 0,
         env_admin_pw_set: !!process.env.ADMIN_PASSWORD,
+        env_admin_pw_len: process.env.ADMIN_PASSWORD?.length || 0,
+        env_keys_starting_admin: Object.keys(process.env).filter(k => k.toUpperCase().includes('ADMIN')),
+        env_total_count: Object.keys(process.env).length,
       };
       try {
         const pingStart = Date.now();
